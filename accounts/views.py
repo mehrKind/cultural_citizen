@@ -8,7 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 class UserProfileView(APIView):
-    permission_classes = [AllowAny]
+    
     def get(self, request: Request):
         profiles = UserProfile.objects.order_by('id').all()
         ProfileSerializer = UserProfileSerializer(profiles, many=True)
@@ -37,7 +37,7 @@ class UserProfileView(APIView):
         }, status= status.HTTP_400_BAD_REQUEST)
 
 class UserProfileDetailApiView(APIView):
-    permission_classes = [AllowAny]
+    
     def get_object(self, profile_id:int):
         try:
             profile = UserProfile.objects.get(pk=profile_id)
