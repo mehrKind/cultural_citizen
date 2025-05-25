@@ -6,6 +6,10 @@ from .serializers import UserProfileSerializer, SignupSerializer
 from rest_framework import status 
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
 
 class UserProfileView(APIView):
     
@@ -109,3 +113,31 @@ class SignupView(APIView):
             "data": None,
             "error": serializer.errors
         }, status= status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(APIView):
+
+    permission_classes = [AllowAny]
+    def post(self, request):
+        data = request.data
+        user = User.objects.filter(email=data['email']).first()
+
+
+        if user and user.check_password(data['password']):
+            refresh = RefreshToken.for_user(user)
+            is_admin = user.profile.is_admin
+
+            return Response({
+                "status": 200,
+                "date":{'refresh': str(refresh), 'access': str(refresh.access_token), 'is_admin': is_admin},
+                "error": None
+            }, status=status.HTTP_200_OK)
+        
+        
+        return Response({
+            "status": 401,
+            "data": None,
+            "error": "there is no user with given data"
+        }, status= status.HTTP_200_OK)
+
+        
